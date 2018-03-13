@@ -46,7 +46,7 @@ class DCMHelper(object):
         information['SOPInstanceUID'] = dataset.SOPInstanceUID
         information['Manufacturer'] = dataset.Manufacturer
 
-        print(dataset.dir())
+        # print(dataset.dir())
         return information
 
 # dc = DCMHelper("C:/Users/liu/Desktop/TG18-RH-2k-01.dcm", '')
