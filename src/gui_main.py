@@ -2,7 +2,7 @@
 import sys
 from PyQt4 import QtGui, QtCore
 import shutil
-import dcm2img
+from src.dcm import dcm2img
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -44,7 +44,8 @@ class MainWindow(QtGui.QMainWindow):
         widget = QtGui.QWidget()
 
         left_vbox = QtGui.QVBoxLayout()
-        pixmap = QtGui.QPixmap("../data/test.png")
+        pixmap = QtGui.QPixmap(700, 600)
+        pixmap.fill()
         label = QtGui.QLabel()
         label.setPixmap(pixmap)
         left_vbox.addWidget(label)
@@ -129,6 +130,7 @@ class MainWindow(QtGui.QMainWindow):
             # 图片
             dcm_helper.dcm_to_img()
             pixmap = QtGui.QPixmap("../data/temp.png")
+            pixmap = pixmap.scaled(700, 600)
             self.label.setPixmap(pixmap)
             # 病人信心
             infor = dcm_helper.read_information()

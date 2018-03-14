@@ -3,6 +3,7 @@ matplotlib.rcParams['backend'] = "Qt4Agg"
 import pydicom
 import matplotlib.pyplot as plt
 
+
 class DCMHelper(object):
     def __init__(self, dcm_path, img_path):
         self.dcm_path = dcm_path
@@ -13,9 +14,9 @@ class DCMHelper(object):
         dataset = pydicom.dcmread(filename)
 
         if 'PixelData' in dataset:
-            rows = int(dataset.Rows)
-            cols = int(dataset.Columns)
-            print("Image size.......: {rows:d} x {cols:d}, {size:d} bytes".format(
+            rows = float(dataset.Rows)
+            cols = float(dataset.Columns)
+            print("Image size.......: {rows:f} x {cols:f}, {size:d} bytes".format(
                 rows=rows, cols=cols, size=len(dataset.PixelData)))
             if 'PixelSpacing' in dataset:
                 print("Pixel spacing....:", dataset.PixelSpacing)
@@ -24,7 +25,7 @@ class DCMHelper(object):
         print("Slice location...:", dataset.get('SliceLocation', "(missing)"))
 
         # plot the image using matplotlib
-        # print(dataset.pixel_array)
+        plt.figure(figsize=(rows/100, cols/100))
         plt.imshow(dataset.pixel_array, cmap = plt.cm.bone)
         plt.axis('off')
         plt.savefig(self.img_path)
@@ -49,5 +50,15 @@ class DCMHelper(object):
         # print(dataset.dir())
         return information
 
-# dc = DCMHelper("C:/Users/liu/Desktop/TG18-RH-2k-01.dcm", '')
-# dc.read_information()
+    def pixel_to_img(self):
+        filename = self.dcm_path
+        dataset = pydicom.dcmread(filename)
+        if 'PixelData' in dataset:
+            rows = int(dataset.Rows)
+            cols = int(dataset.Columns)
+            image_data = dataset.pixel_array
+        print('(%d, %d)' % (rows, cols))
+        print(image_data)
+
+# dc = DCMHelper("C:/Users/liu/Desktop/TG18-RH-2k-01.dcm", '../temp.png')
+# dc.pixel_to_img()
