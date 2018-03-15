@@ -121,7 +121,7 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def openDir(self):
-        open_dir_path = QtGui.QFileDialog.getOpenFileName(self, 'open file dialog', 'C:\Users', 'DCM files(*.dcm)')
+        open_dir_path = QtGui.QFileDialog.getOpenFileName(self, 'open file dialog', 'C:\Users', '')
         print(open_dir_path)
         open_dir_path = str(open_dir_path) # 之前的open_dialog是QString, 需要转成普通String
 
@@ -129,8 +129,8 @@ class MainWindow(QtGui.QMainWindow):
             dcm_helper = dcm2img.DCMHelper(open_dir_path, '../data/temp.png')
             # 图片
             dcm_helper.dcm_to_img()
-            pixmap = QtGui.QPixmap("../data/temp.png")
-            pixmap = pixmap.scaled(700, 600)
+            pixmap = QtGui.QPixmap("../data/temp.jpg")
+            pixmap = pixmap.scaled(700, 900)
             self.label.setPixmap(pixmap)
             # 病人信心
             infor = dcm_helper.read_information()

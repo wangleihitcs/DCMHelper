@@ -2,6 +2,7 @@ import matplotlib
 matplotlib.rcParams['backend'] = "Qt4Agg"
 import pydicom
 import matplotlib.pyplot as plt
+# import jpeg_ls_hander
 
 
 class DCMHelper(object):
@@ -25,11 +26,14 @@ class DCMHelper(object):
         print("Slice location...:", dataset.get('SliceLocation', "(missing)"))
 
         # plot the image using matplotlib
+        image_array = dataset.PixelData
+        print(dataset.file_meta.TransferSyntaxUID)
+        # print(image_array)
         plt.figure(figsize=(rows/100, cols/100))
         plt.imshow(dataset.pixel_array, cmap = plt.cm.bone)
         plt.axis('off')
         plt.savefig(self.img_path)
-        # plt.show()
+        plt.show()
 
     def read_information(self):
         information = {}
@@ -60,5 +64,7 @@ class DCMHelper(object):
         print('(%d, %d)' % (rows, cols))
         print(image_data)
 
-# dc = DCMHelper("C:/Users/liu/Desktop/TG18-RH-2k-01.dcm", '../temp.png')
-# dc.pixel_to_img()
+# dc = DCMHelper("C:/Users/liu/Desktop/DICOM/IM_0001", '../temp.png')
+# infor = dc.read_information()
+# print(infor)
+# dc.dcm_to_img()
