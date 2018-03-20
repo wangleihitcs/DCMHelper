@@ -2,7 +2,9 @@
 import sys
 from PyQt4 import QtGui, QtCore
 import shutil
+import os
 from dcm import dcm2img
+from utils import dir2array
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -21,7 +23,7 @@ class MainWindow(QtGui.QMainWindow):
         open = QtGui.QAction(QtGui.QIcon('icons/open.png'), 'Open', self)
         open.setShortcut('Ctrl+O')
         open.setStatusTip('Open file')
-        self.connect(open, QtCore.SIGNAL('triggered()'), self.openDir)
+        self.connect(open, QtCore.SIGNAL('triggered()'), self.saveBatch)
         # File菜单下Save
         save = QtGui.QAction(QtGui.QIcon('icons/save.png'), 'Save', self)
         save.setShortcut('Ctrl+S')
@@ -39,6 +41,9 @@ class MainWindow(QtGui.QMainWindow):
         file.addAction(open)
         file.addAction(save)
         file.addAction(exit)
+
+        # batch = menubar.addMenu('&Batch')
+        # self.connect(batch, QtCore.SIGNAL('triggered()'), self.saveBatch)
 
         # 中间布局
         widget = QtGui.QWidget()
@@ -129,7 +134,7 @@ class MainWindow(QtGui.QMainWindow):
             dcm_helper = dcm2img.DCMHelper(open_dir_path, '../data/temp.png')
             # 图片
             dcm_helper.dcm_to_img()
-            pixmap = QtGui.QPixmap("../data/temp.jpg")
+            pixmap = QtGui.QPixmap("../data/temp.png")
             pixmap = pixmap.scaled(700, 900)
             self.label.setPixmap(pixmap)
             # 病人信心
@@ -152,6 +157,34 @@ class MainWindow(QtGui.QMainWindow):
             shutil.copyfile('../data/temp.png', save_dir_path)
             print('save .png success!')
 
+    def saveBatch(self):
+        # open_dir_path = QtGui.QFileDialog.getOpenFileName(self, 'open file dialog', '', '')
+        # print(open_dir_path)
+        # open_dir_path = str(open_dir_path)  # 之前的open_dialog是QString, 需要转成普通String
+        #
+        # if open_dir_path != '':
+        #     dcm_helper = dcm2img.DCMHelper(open_dir_path, '../data/temp.png')
+        open_path = 'C:/Users/liu/Desktop/1000968749CTA'
+        save_path = 'C:/Users/liu/Desktop/test'
+        dt = dir2array.DirTree(open_path, save_path)
+        dir_tree = dt.getDirTree()
+        print(dir_tree)
+        save_path1 = save_path + '/' + '1000968749CTA'
+        if os.path.exists(save_path1) == False:
+            os.mkdir(save_path1)
+        for key in dir_tree.keys():
+            if key != 'path':
+                if os.path.exists(save_path1 + '/' + key) == False:
+                    os.mkdir(save_path1 + '/' + key)
+        for key in dir_tree.keys():
+            if key != 'path':
+                open_path1 = open_path + '/' + key
+                name_list = dir_tree[key]
+                for name in name_list:
+                    dcm_helper = dcm2img.DCMHelper(open_path1 + '/' + name, save_path1 + '/' + key + '/' + name + '.png')
+                    if os.path.exists(save_path1 + '/' + key + '/' + name + '.png') == False:
+                        dcm_helper.dcm_to_img()
+                        print(save_path1 + '/' + key + '/'+ name + '.png')
 
 
 def start():

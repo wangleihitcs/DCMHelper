@@ -33,7 +33,7 @@ class DCMHelper(object):
         plt.imshow(dataset.pixel_array, cmap = plt.cm.bone)
         plt.axis('off')
         plt.savefig(self.img_path)
-        plt.show()
+        # plt.show()
 
     def read_information(self):
         information = {}
