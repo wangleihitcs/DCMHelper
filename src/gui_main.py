@@ -2,7 +2,7 @@
 import sys
 from PyQt4 import QtGui, QtCore
 import shutil
-from src.dcm import dcm2img
+from dcm import dcm2img
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -121,7 +121,7 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def openDir(self):
-        open_dir_path = QtGui.QFileDialog.getOpenFileName(self, 'open file dialog', 'C:\Users', '')
+        open_dir_path = QtGui.QFileDialog.getOpenFileName(self, 'open file dialog', '', '')
         print(open_dir_path)
         open_dir_path = str(open_dir_path) # 之前的open_dialog是QString, 需要转成普通String
 
@@ -145,7 +145,7 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def saveDir(self):
-        save_dir_path = QtGui.QFileDialog.getSaveFileName(self, 'save file dialog', 'C:\Users', 'PNG file(*.png)')
+        save_dir_path = QtGui.QFileDialog.getSaveFileName(self, 'save file dialog', '', 'PNG file(*.png)')
         save_dir_path = str(save_dir_path)
 
         if save_dir_path != '':
