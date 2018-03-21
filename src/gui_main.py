@@ -23,12 +23,12 @@ class MainWindow(QtGui.QMainWindow):
         open = QtGui.QAction(QtGui.QIcon('icons/open.png'), 'Open', self)
         open.setShortcut('Ctrl+O')
         open.setStatusTip('Open file')
-        self.connect(open, QtCore.SIGNAL('triggered()'), self.saveBatch)
+        self.connect(open, QtCore.SIGNAL('triggered()'), self.toOpen)
         # File菜单下Save
         save = QtGui.QAction(QtGui.QIcon('icons/save.png'), 'Save', self)
         save.setShortcut('Ctrl+S')
         save.setStatusTip('Save file')
-        self.connect(save, QtCore.SIGNAL('triggered()'), self.saveDir)
+        self.connect(save, QtCore.SIGNAL('triggered()'), self.toSave)
         # File菜单下Exit
         exit = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'Exit', self)
         exit.setShortcut('Ctrl+Q')
@@ -42,9 +42,71 @@ class MainWindow(QtGui.QMainWindow):
         file.addAction(save)
         file.addAction(exit)
 
-        # batch = menubar.addMenu('&Batch')
+        batch = QtGui.QAction(QtGui.QIcon('icons/open.png'), 'Batch', self)
+        batch.setShortcut('Ctrl+B')
+        batch.setStatusTip('Batch to img')
+        self.connect(batch, QtCore.SIGNAL('triggered()'), self.toBatch)
+        menubar.addAction(batch)
         # self.connect(batch, QtCore.SIGNAL('triggered()'), self.saveBatch)
 
+        self.one_ui_widget()
+
+
+
+    def toOpen(self):
+        self.one_ui_widget()
+        open_dir_path = QtGui.QFileDialog.getOpenFileName(self, 'open file dialog', '', '')
+        print(open_dir_path)
+        open_dir_path = str(open_dir_path) # 之前的open_dialog是QString, 需要转成普通String
+
+        if open_dir_path != '':
+            dcm_helper = dcm2img.DCMHelper(open_dir_path, '../data/temp.png')
+            # 图片
+            dcm_helper.dcm_to_img()
+            pixmap = QtGui.QPixmap("../data/temp.png")
+            pixmap = pixmap.scaled(700, 900)
+            self.label.setPixmap(pixmap)
+            # 病人信心
+            infor = dcm_helper.read_information()
+            print(infor)
+            self.patient_id_edit.setText(infor['PatientID'])
+            self.patient_name_edit.setText(infor['PatientName'])
+            self.patient_bdate_edit.setText(infor['PatientBirthDate'])
+            self.patient_sex_edit.setText(infor['PatientSex'])
+            self.study_id_edit.setText(infor['StudyID'])
+            self.study_date_edit.setText(infor['StudyDate'])
+            self.sop_uid_edit.setText(infor['SOPInstanceUID'])
+    def toSave(self):
+        # self.one_ui_widget()
+        save_dir_path = QtGui.QFileDialog.getSaveFileName(self, 'save file dialog', '', 'PNG file(*.png)')
+        save_dir_path = str(save_dir_path)
+
+        if save_dir_path != '':
+            shutil.copyfile('../data/temp.png', save_dir_path)
+            print('save .png success!')
+    def toBatch(self):
+        self.batch_ui_widget()
+    def toButtonOpen1(self):
+        open_dir_path = QtGui.QFileDialog.getExistingDirectory(self, 'open directory dialog', 'C:/', QtGui.QFileDialog.ShowDirsOnly)
+        print(open_dir_path)
+        open_dir_path = str(open_dir_path)  # 之前的open_dialog是QString, 需要转成普通String
+        self.patient_dir_edit.setText(open_dir_path)
+    def toButtonOpen2(self):
+        open_dir_path = QtGui.QFileDialog.getExistingDirectory(self, 'open directory dialog', 'C:/', QtGui.QFileDialog.ShowDirsOnly)
+        print(open_dir_path)
+        open_dir_path = str(open_dir_path)  # 之前的open_dialog是QString, 需要转成普通String
+        self.img_save_edit.setText(open_dir_path)
+    def toStart(self):
+        # print(self.patient_dir_edit.text())
+        if self.patient_dir_edit.text() != '' and self.img_save_edit.text() != '':
+            open_path = self.patient_dir_edit.text()
+            save_path = self.img_save_edit.text()
+            dcm_helper = dcm2img.DCMHelper(open_path, save_path)
+            dcm_helper.batch_dcm_to_image()
+        else:
+            print('Dir is null')
+
+    def one_ui_widget(self):
         # 中间布局
         widget = QtGui.QWidget()
 
@@ -124,68 +186,44 @@ class MainWindow(QtGui.QMainWindow):
         self.sop_uid_edit = sop_uid_edit
         self.label = label
 
+    def batch_ui_widget(self):
+        # batch 处理布局
+        widget = QtGui.QWidget()
 
-    def openDir(self):
-        open_dir_path = QtGui.QFileDialog.getOpenFileName(self, 'open file dialog', '', '')
-        print(open_dir_path)
-        open_dir_path = str(open_dir_path) # 之前的open_dialog是QString, 需要转成普通String
+        grid_layout = QtGui.QGridLayout()
+        patient_dir_label = QtGui.QLabel('DCM Dir')
+        patient_dir_edit = QtGui.QLineEdit('')
+        patient_dir_edit.setText('')
+        open1 = QtGui.QPushButton('open', self)
+        open1.clicked.connect(self.toButtonOpen1)
 
-        if open_dir_path != '':
-            dcm_helper = dcm2img.DCMHelper(open_dir_path, '../data/temp.png')
-            # 图片
-            dcm_helper.dcm_to_img()
-            pixmap = QtGui.QPixmap("../data/temp.png")
-            pixmap = pixmap.scaled(700, 900)
-            self.label.setPixmap(pixmap)
-            # 病人信心
-            infor = dcm_helper.read_information()
-            print(infor)
-            self.patient_id_edit.setText(infor['PatientID'])
-            self.patient_name_edit.setText(infor['PatientName'])
-            self.patient_bdate_edit.setText(infor['PatientBirthDate'])
-            self.patient_sex_edit.setText(infor['PatientSex'])
-            self.study_id_edit.setText(infor['StudyID'])
-            self.study_date_edit.setText(infor['StudyDate'])
-            self.sop_uid_edit.setText(infor['SOPInstanceUID'])
+        img_save_label = QtGui.QLabel('PNG Dir')
+        img_save_edit = QtGui.QLineEdit()
+        img_save_edit.setText('')
+        open2 = QtGui.QPushButton('open', self)
+        open2.clicked.connect(self.toButtonOpen2)
 
+        start = QtGui.QPushButton('start', self)
+        start.clicked.connect(self.toStart)
 
-    def saveDir(self):
-        save_dir_path = QtGui.QFileDialog.getSaveFileName(self, 'save file dialog', '', 'PNG file(*.png)')
-        save_dir_path = str(save_dir_path)
+        log_text_label = QtGui.QLabel('Logs')
+        log_text_edit = QtGui.QTextEdit()
 
-        if save_dir_path != '':
-            shutil.copyfile('../data/temp.png', save_dir_path)
-            print('save .png success!')
+        grid_layout.setSpacing(10)
+        grid_layout.addWidget(patient_dir_label, 1, 0)
+        grid_layout.addWidget(patient_dir_edit, 1, 1)
+        grid_layout.addWidget(open1, 1, 2)
+        grid_layout.addWidget(img_save_label, 2, 0)
+        grid_layout.addWidget(img_save_edit, 2, 1)
+        grid_layout.addWidget(open2, 2, 2)
+        grid_layout.addWidget(start, 3, 2)
+        grid_layout.addWidget(log_text_label, 4 , 0)
+        grid_layout.addWidget(log_text_edit, 4, 1, 5, 1)
 
-    def saveBatch(self):
-        # open_dir_path = QtGui.QFileDialog.getOpenFileName(self, 'open file dialog', '', '')
-        # print(open_dir_path)
-        # open_dir_path = str(open_dir_path)  # 之前的open_dialog是QString, 需要转成普通String
-        #
-        # if open_dir_path != '':
-        #     dcm_helper = dcm2img.DCMHelper(open_dir_path, '../data/temp.png')
-        open_path = 'C:/Users/liu/Desktop/1000968749CTA'
-        save_path = 'C:/Users/liu/Desktop/test'
-        dt = dir2array.DirTree(open_path, save_path)
-        dir_tree = dt.getDirTree()
-        print(dir_tree)
-        save_path1 = save_path + '/' + '1000968749CTA'
-        if os.path.exists(save_path1) == False:
-            os.mkdir(save_path1)
-        for key in dir_tree.keys():
-            if key != 'path':
-                if os.path.exists(save_path1 + '/' + key) == False:
-                    os.mkdir(save_path1 + '/' + key)
-        for key in dir_tree.keys():
-            if key != 'path':
-                open_path1 = open_path + '/' + key
-                name_list = dir_tree[key]
-                for name in name_list:
-                    dcm_helper = dcm2img.DCMHelper(open_path1 + '/' + name, save_path1 + '/' + key + '/' + name + '.png')
-                    if os.path.exists(save_path1 + '/' + key + '/' + name + '.png') == False:
-                        dcm_helper.dcm_to_img()
-                        print(save_path1 + '/' + key + '/'+ name + '.png')
-
+        widget.setLayout(grid_layout)
+        self.setCentralWidget(widget)
+        self.patient_dir_edit = patient_dir_edit
+        self.img_save_edit = img_save_edit
 
 def start():
 	app = QtGui.QApplication(sys.argv)
