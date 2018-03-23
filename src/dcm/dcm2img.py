@@ -15,30 +15,38 @@ class DCMHelper(object):
         self.dcm_to_img_by_path(self.dcm_path, self.img_path)
 
     def batch_dcm_to_image(self):
+        str = ''
+        char = '\\'
         open_path = self.dcm_path
-        str_array = open_path.split('/')
+        str_array = open_path.split(char)
         pantient_dirname = str_array[-1]
+        # print(pantient_dirname)
         save_path = self.img_path
 
         dt = dir2array.DirTree(open_path, save_path)
         dir_tree = dt.getDirTree()
         # print(dir_tree)
-        save_path1 = save_path + '/' + pantient_dirname + '(PNG)'
+        save_path1 = save_path + char + pantient_dirname + '(PNG)'
         if os.path.exists(save_path1) == False:
             os.mkdir(save_path1)
         for key in dir_tree.keys():
             if key != 'path':
-                if os.path.exists(save_path1 + '/' + key) == False:
-                    os.mkdir(save_path1 + '/' + key)
+                if os.path.exists(save_path1 + char + key) == False:
+                    os.mkdir(save_path1 + char + key)
         for key in dir_tree.keys():
             if key != 'path':
-                open_path1 = open_path + '/' + key
+                open_path1 = open_path + char + key
                 name_list = dir_tree[key]
                 for name in name_list:
-                    if os.path.exists(save_path1 + '/' + key + '/' + name + '.png') == False:
-                        self.dcm_to_img_by_path(open_path1 + '/' + name, save_path1 + '/' + key + '/' + name + '.png')
-                        print(save_path1 + '/' + key + '/' + name + '.png')
+                    if os.path.exists(save_path1 + char + key + char + name + '.png') == False:
+                        self.dcm_to_img_by_path(open_path1 + char + name, save_path1 + char + key + char + name + '.png')
+                        str += save_path1 + char + key + char + name + '.png success' + '\n'
+                        print(save_path1 + char + key + char + name + '.png success')
+                    else:
+                        str += save_path1 + char + key + char + name + '.png success' + '\n'
+                        print(save_path1 + char + key + char + name + '.png success')
         print('batch save to img success!')
+        return str
 
     def dcm_to_img_by_path(self, open_dcm_path, save_img_path):
         filename = open_dcm_path

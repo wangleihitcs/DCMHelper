@@ -49,8 +49,8 @@ class MainWindow(QtGui.QMainWindow):
         menubar.addAction(batch)
         # self.connect(batch, QtCore.SIGNAL('triggered()'), self.saveBatch)
 
-        self.one_ui_widget()
-
+        # self.one_ui_widget()
+        self.batch_ui_widget()
 
 
     def toOpen(self):
@@ -98,11 +98,14 @@ class MainWindow(QtGui.QMainWindow):
         self.img_save_edit.setText(open_dir_path)
     def toStart(self):
         # print(self.patient_dir_edit.text())
+        open_path = str(self.patient_dir_edit.text())
+        save_path = str(self.img_save_edit.text())
         if self.patient_dir_edit.text() != '' and self.img_save_edit.text() != '':
-            open_path = self.patient_dir_edit.text()
-            save_path = self.img_save_edit.text()
+            open_path = open_path
+            save_path = save_path
             dcm_helper = dcm2img.DCMHelper(open_path, save_path)
-            dcm_helper.batch_dcm_to_image()
+            log_str = dcm_helper.batch_dcm_to_image()
+            self.log_text_edit.setText(log_str)
         else:
             print('Dir is null')
 
@@ -191,10 +194,14 @@ class MainWindow(QtGui.QMainWindow):
         widget = QtGui.QWidget()
 
         grid_layout = QtGui.QGridLayout()
+        grid_layout.setContentsMargins(200, 30, 200, 30)
         patient_dir_label = QtGui.QLabel('DCM Dir')
+        # patient_dir_label.setContentsMargins(100, 20, 20, 10) # left, top, right, bottom
         patient_dir_edit = QtGui.QLineEdit('')
         patient_dir_edit.setText('')
+        # patient_dir_edit.setContentsMargins(0, 20, 400, 10)
         open1 = QtGui.QPushButton('open', self)
+        # open1.setContentsMargins(0, 20, 200, 10)
         open1.clicked.connect(self.toButtonOpen1)
 
         img_save_label = QtGui.QLabel('PNG Dir')
@@ -205,11 +212,12 @@ class MainWindow(QtGui.QMainWindow):
 
         start = QtGui.QPushButton('start', self)
         start.clicked.connect(self.toStart)
-
+        start.setMaximumHeight(30)
+        start.setMaximumWidth(100)
         log_text_label = QtGui.QLabel('Logs')
         log_text_edit = QtGui.QTextEdit()
 
-        grid_layout.setSpacing(10)
+        grid_layout.setSpacing(20)
         grid_layout.addWidget(patient_dir_label, 1, 0)
         grid_layout.addWidget(patient_dir_edit, 1, 1)
         grid_layout.addWidget(open1, 1, 2)
@@ -224,6 +232,7 @@ class MainWindow(QtGui.QMainWindow):
         self.setCentralWidget(widget)
         self.patient_dir_edit = patient_dir_edit
         self.img_save_edit = img_save_edit
+        self.log_text_edit = log_text_edit
 
 def start():
 	app = QtGui.QApplication(sys.argv)
