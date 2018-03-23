@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="dc2a1437-9832-413f-9747-b2b3fb27faed" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/dcm/dcm2img.py" afterPath="$PROJECT_DIR$/src/dcm/dcm2img.py" />
-      <change beforePath="$PROJECT_DIR$/src/gui_main.py" afterPath="$PROJECT_DIR$/src/gui_main.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -298,7 +296,14 @@
       <option name="project" value="LOCAL" />
       <updated>1521661119812</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="test 1.5">
+      <created>1521812702311</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1521812702311</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="ToolWindowManager">
