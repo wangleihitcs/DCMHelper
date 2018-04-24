@@ -14,7 +14,8 @@ class DirTree(object):
                 # child_dir_tree = {}
                 series_path = dirname
                 filename_list = []
-                for parent, dirnames, filenames in os.walk(self.dcm_path + '/' + series_path):
+                path_1 = os.path.join(self.dcm_path, series_path)
+                for parent, dirnames, filenames in os.walk(path_1):
                     for filename in filenames:
                         filename_list.append(filename)
                 # child_dir_tree['filepaths'] = filename_list

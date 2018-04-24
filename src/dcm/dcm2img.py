@@ -16,35 +16,39 @@ class DCMHelper(object):
 
     def batch_dcm_to_image(self):
         str = ''
-        char = '\\'
+        char = os.path.pathsep
         open_path = self.dcm_path
-        str_array = open_path.split(char)
+        str_array = open_path.split('/')
         pantient_dirname = str_array[-1]
-        # print(pantient_dirname)
-        save_path = self.img_path
+        print(pantient_dirname)
 
-        dt = dir2array.DirTree(open_path, save_path)
-        dir_tree = dt.getDirTree()
-        # print(dir_tree)
-        save_path1 = save_path + char + pantient_dirname + '(PNG)'
+        save_path_filename = pantient_dirname + '(PNG)'
+        save_path1 = os.path.join(self.img_path, save_path_filename)
         if os.path.exists(save_path1) == False:
             os.mkdir(save_path1)
+        print(save_path1)
+
+        dt = dir2array.DirTree(open_path, '')
+        dir_tree = dt.getDirTree()
         for key in dir_tree.keys():
             if key != 'path':
-                if os.path.exists(save_path1 + char + key) == False:
-                    os.mkdir(save_path1 + char + key)
+                path_1 = os.path.join(save_path1, key)
+                if os.path.exists(path_1) == False:
+                    os.mkdir(path_1)
+
         for key in dir_tree.keys():
             if key != 'path':
-                open_path1 = open_path + char + key
+                open_path1 = os.path.join(open_path, key)
                 name_list = dir_tree[key]
                 for name in name_list:
-                    if os.path.exists(save_path1 + char + key + char + name + '.png') == False:
-                        self.dcm_to_img_by_path(open_path1 + char + name, save_path1 + char + key + char + name + '.png')
-                        str += save_path1 + char + key + char + name + '.png success' + '\n'
-                        print(save_path1 + char + key + char + name + '.png success')
+                    path_2 = os.path.join(save_path1, key, name+'.png')
+                    if os.path.exists(path_2) == False:
+                        self.dcm_to_img_by_path(os.path.join(open_path1, name), path_2)
+                        str += os.path.join(save_path1, name) + '.png success' + '\n'
+                        # print(os.path.join(save_path1, name) + '.png success')
                     else:
-                        str += save_path1 + char + key + char + name + '.png success' + '\n'
-                        print(save_path1 + char + key + char + name + '.png success')
+                        str += os.path.join(save_path1, name) + '.png success' + '\n'
+                        # print(os.path.join(save_path1, name) + '.png success')
         print('batch save to img success!')
         return str
 
@@ -64,8 +68,8 @@ class DCMHelper(object):
         # print("Slice location...:", dataset.get('SliceLocation', "(missing)"))
 
         # plot the image using matplotlib
-        image_array = dataset.PixelData
-        print(dataset.file_meta.TransferSyntaxUID)
+        # image_array = dataset.PixelData
+        # print(dataset.file_meta.TransferSyntaxUID)
         # print(image_array)
         plt.figure(figsize=(rows/100, cols/100))
         plt.imshow(dataset.pixel_array, cmap = plt.cm.bone)

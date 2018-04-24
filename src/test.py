@@ -1,5 +1,9 @@
-import pydicom
+# import pydicom
+#
+# dataset = pydicom.read_file('C:/Users/liu/Desktop/DICOM/IM_0001')
+#
+# print(dataset.pixel_array)
 
-dataset = pydicom.read_file('C:/Users/liu/Desktop/DICOM/IM_0001')
+import PyQt5.QtGui
 
-print(dataset.pixel_array)
+print('zz')

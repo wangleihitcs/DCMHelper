@@ -1,15 +1,14 @@
 # -*- coding:utf-8 -*-
 import sys
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 import shutil
-import os
 from dcm import dcm2img
-from utils import dir2array
+# from dcm import signals
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
 
-class MainWindow(QtGui.QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.initUI()
@@ -20,20 +19,23 @@ class MainWindow(QtGui.QMainWindow):
         self.setWindowTitle('DCM Tool')
 
         # File菜单下Open
-        open = QtGui.QAction(QtGui.QIcon('icons/open.png'), 'Open', self)
+        open = QtWidgets.QAction(QtGui.QIcon('icons/open.png'), 'Open', self)
         open.setShortcut('Ctrl+O')
         open.setStatusTip('Open file')
-        self.connect(open, QtCore.SIGNAL('triggered()'), self.toOpen)
+        # self.connect(open, QtCore.SIGNAL('triggered()'), self.toOpen)
+        open.triggered.connect(self.toOpen)
         # File菜单下Save
-        save = QtGui.QAction(QtGui.QIcon('icons/save.png'), 'Save', self)
+        save = QtWidgets.QAction(QtGui.QIcon('icons/save.png'), 'Save', self)
         save.setShortcut('Ctrl+S')
         save.setStatusTip('Save file')
-        self.connect(save, QtCore.SIGNAL('triggered()'), self.toSave)
+        # self.connect(save, QtCore.SIGNAL('triggered()'), self.toSave)
+        save.triggered.connect(self.toSave)
         # File菜单下Exit
-        exit = QtGui.QAction(QtGui.QIcon('icons/exit.png'), 'Exit', self)
+        exit = QtWidgets.QAction(QtGui.QIcon('icons/exit.png'), 'Exit', self)
         exit.setShortcut('Ctrl+Q')
         exit.setStatusTip('Exit application')
-        self.connect(exit, QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()'))
+        # self.connect(exit, QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()'))
+        exit.triggered.connect(QtWidgets.qApp.quit)
         self.statusBar().showMessage('Ready') # 状态栏
         # 菜单
         menubar = self.menuBar()
@@ -42,10 +44,11 @@ class MainWindow(QtGui.QMainWindow):
         file.addAction(save)
         file.addAction(exit)
 
-        batch = QtGui.QAction(QtGui.QIcon('icons/open.png'), 'Batch', self)
+        batch = QtWidgets.QAction(QtGui.QIcon('icons/open.png'), 'Batch', self)
         batch.setShortcut('Ctrl+B')
         batch.setStatusTip('Batch to img')
-        self.connect(batch, QtCore.SIGNAL('triggered()'), self.toBatch)
+        # self.connect(batch, QtCore.SIGNAL('triggered()'), self.toBatch)
+        batch.triggered.connect(self.toBatch)
         menubar.addAction(batch)
         # self.connect(batch, QtCore.SIGNAL('triggered()'), self.saveBatch)
 
@@ -87,17 +90,20 @@ class MainWindow(QtGui.QMainWindow):
     def toBatch(self):
         self.batch_ui_widget()
     def toButtonOpen1(self):
-        open_dir_path = QtGui.QFileDialog.getExistingDirectory(self, 'open directory dialog', 'C:/', QtGui.QFileDialog.ShowDirsOnly)
-        print(open_dir_path)
+        open_dir_path = QtWidgets.QFileDialog.getExistingDirectory(self, 'open directory dialog', 'C:/', QtWidgets.QFileDialog.ShowDirsOnly)
+        # print(open_dir_path)
         open_dir_path = str(open_dir_path)  # 之前的open_dialog是QString, 需要转成普通String
         self.patient_dir_edit.setText(open_dir_path)
     def toButtonOpen2(self):
-        open_dir_path = QtGui.QFileDialog.getExistingDirectory(self, 'open directory dialog', 'C:/', QtGui.QFileDialog.ShowDirsOnly)
-        print(open_dir_path)
+        open_dir_path = QtWidgets.QFileDialog.getExistingDirectory(self, 'open directory dialog', 'C:/', QtWidgets.QFileDialog.ShowDirsOnly)
+        # print(open_dir_path)
         open_dir_path = str(open_dir_path)  # 之前的open_dialog是QString, 需要转成普通String
         self.img_save_edit.setText(open_dir_path)
     def toStart(self):
-        # print(self.patient_dir_edit.text())
+        # # print(self.patient_dir_edit.text())
+        reply = QtWidgets.QMessageBox.information(self, '提示', '即将转换，请确认并等待!',
+                                                  QtWidgets.QMessageBox.Yes|QtWidgets.QMessageBox.No)
+        print(reply)
         open_path = str(self.patient_dir_edit.text())
         save_path = str(self.img_save_edit.text())
         if self.patient_dir_edit.text() != '' and self.img_save_edit.text() != '':
@@ -109,43 +115,51 @@ class MainWindow(QtGui.QMainWindow):
         else:
             print('Dir is null')
 
+        # logSignal = signals.LogsSignal()
+        # logSignal.str_signal.connect(self.log_slot)
+        # logSignal.run()
+
+    def log_slot(self, log_str):
+        # self.log_text_edit.setText('zzzzzz')
+        self.log_text_edit.setText(log_str)
+
     def one_ui_widget(self):
         # 中间布局
-        widget = QtGui.QWidget()
+        widget = QtWidgets.QWidget()
 
-        left_vbox = QtGui.QVBoxLayout()
-        pixmap = QtGui.QPixmap(700, 600)
+        left_vbox = QtWidgets.QVBoxLayout()
+        pixmap = QtWidgets.QPixmap(700, 600)
         pixmap.fill()
-        label = QtGui.QLabel()
+        label = QtWidgets.QLabel()
         label.setPixmap(pixmap)
         left_vbox.addWidget(label)
 
-        patient_id_label = QtGui.QLabel('PatientID:')
-        patient_id_edit = QtGui.QLineEdit()
+        patient_id_label = QtWidgets.QLabel('PatientID:')
+        patient_id_edit = QtWidgets.QLineEdit()
         patient_id_edit.setEnabled(False)
         patient_id_edit.setText('')
-        patient_name_label = QtGui.QLabel('PatientName:')
-        patient_name_edit = QtGui.QLineEdit()
+        patient_name_label = QtWidgets.QLabel('PatientName:')
+        patient_name_edit = QtWidgets.QLineEdit()
         patient_name_edit.setEnabled(False)
         patient_name_edit.setText('')
-        patient_bdate_label = QtGui.QLabel('PatientBirthDate:')
-        patient_bdate_edit = QtGui.QLineEdit()
+        patient_bdate_label = QtWidgets.QLabel('PatientBirthDate:')
+        patient_bdate_edit = QtWidgets.QLineEdit()
         patient_bdate_edit.setEnabled(False)
         patient_bdate_edit.setText('')
-        patient_sex_label = QtGui.QLabel('PatientSex:')
-        patient_sex_edit = QtGui.QLineEdit()
+        patient_sex_label = QtWidgets.QLabel('PatientSex:')
+        patient_sex_edit = QtWidgets.QLineEdit()
         patient_sex_edit.setEnabled(False)
         patient_sex_edit.setText('')
-        study_id_label = QtGui.QLabel('StudyID:')
-        study_id_edit = QtGui.QLineEdit()
+        study_id_label = QtWidgets.QLabel('StudyID:')
+        study_id_edit = QtWidgets.QLineEdit()
         study_id_edit.setEnabled(False)
         study_id_edit.setText('')
-        study_date_label = QtGui.QLabel('StudyDate:')
-        study_date_edit = QtGui.QLineEdit()
+        study_date_label = QtWidgets.QLabel('StudyDate:')
+        study_date_edit = QtWidgets.QLineEdit()
         study_date_edit.setEnabled(False)
         study_date_edit.setText('')
-        sop_uid_label = QtGui.QLabel('SOPInstanceUID:')
-        sop_uid_edit = QtGui.QLineEdit()
+        sop_uid_label = QtWidgets.QLabel('SOPInstanceUID:')
+        sop_uid_edit = QtWidgets.QLineEdit()
         sop_uid_edit.setEnabled(False)
         sop_uid_edit.setText('')
 
@@ -168,7 +182,7 @@ class MainWindow(QtGui.QMainWindow):
         right_grid.addWidget(sop_uid_edit, 7, 1)
         right_vbox.addLayout(right_grid)
 
-        main_layout = QtGui.QHBoxLayout()
+        main_layout = QtWidgets.QHBoxLayout()
         # hbox.setStretch(0, 1)
         # hbox.setStretch(1, 2)
         # main_layout.setMargin(15)
@@ -191,31 +205,31 @@ class MainWindow(QtGui.QMainWindow):
 
     def batch_ui_widget(self):
         # batch 处理布局
-        widget = QtGui.QWidget()
+        widget = QtWidgets.QWidget()
 
-        grid_layout = QtGui.QGridLayout()
+        grid_layout = QtWidgets.QGridLayout()
         grid_layout.setContentsMargins(200, 30, 200, 30)
-        patient_dir_label = QtGui.QLabel('DCM Dir')
+        patient_dir_label = QtWidgets.QLabel('DCM Dir')
         # patient_dir_label.setContentsMargins(100, 20, 20, 10) # left, top, right, bottom
-        patient_dir_edit = QtGui.QLineEdit('')
+        patient_dir_edit = QtWidgets.QLineEdit('')
         patient_dir_edit.setText('')
         # patient_dir_edit.setContentsMargins(0, 20, 400, 10)
-        open1 = QtGui.QPushButton('open', self)
+        open1 = QtWidgets.QPushButton('open', self)
         # open1.setContentsMargins(0, 20, 200, 10)
         open1.clicked.connect(self.toButtonOpen1)
 
-        img_save_label = QtGui.QLabel('PNG Dir')
-        img_save_edit = QtGui.QLineEdit()
+        img_save_label = QtWidgets.QLabel('PNG Dir')
+        img_save_edit = QtWidgets.QLineEdit()
         img_save_edit.setText('')
-        open2 = QtGui.QPushButton('open', self)
+        open2 = QtWidgets.QPushButton('open', self)
         open2.clicked.connect(self.toButtonOpen2)
 
-        start = QtGui.QPushButton('start', self)
+        start = QtWidgets.QPushButton('start', self)
         start.clicked.connect(self.toStart)
         start.setMaximumHeight(30)
         start.setMaximumWidth(100)
-        log_text_label = QtGui.QLabel('Logs')
-        log_text_edit = QtGui.QTextEdit()
+        log_text_label = QtWidgets.QLabel('Logs')
+        log_text_edit = QtWidgets.QTextEdit()
 
         grid_layout.setSpacing(20)
         grid_layout.addWidget(patient_dir_label, 1, 0)
@@ -235,11 +249,14 @@ class MainWindow(QtGui.QMainWindow):
         self.log_text_edit = log_text_edit
 
 def start():
-	app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
 
-	main = MainWindow()
-	main.show()
+    main = MainWindow()
+    # logThread = threads.StrThread()
+    # logThread.str_signal.connect(main.log_slot)
+    # logThread.start()
+    main.show()
 
-	sys.exit(app.exec_())
+    sys.exit(app.exec_())
 
 start()
