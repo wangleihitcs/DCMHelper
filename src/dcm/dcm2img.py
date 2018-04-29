@@ -1,5 +1,6 @@
 import matplotlib
-matplotlib.rcParams['backend'] = "Qt4Agg"
+#matplotlib.rcParams['backend'] = "Qt4Agg"
+matplotlib.use('Agg')
 import pydicom
 import matplotlib.pyplot as plt
 import os
