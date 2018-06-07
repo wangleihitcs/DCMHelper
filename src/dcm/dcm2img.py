@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 import matplotlib
 #matplotlib.rcParams['backend'] = "Qt4Agg"
 matplotlib.use('Agg')
@@ -16,6 +17,22 @@ class DCMHelper(object):
         self.dcm_to_img_by_path(self.dcm_path, self.img_path)
 
     def batch_dcm_to_image(self):
+        str = ''
+        print(self.dcm_path)
+        print(self.img_path)
+        dt = dir2array.DirTree(self.dcm_path, self.img_path)
+        dict_list = dt.getDictList()
+        for dict in dict_list:
+            for k, v in dict.items():
+                dirpath = os.path.abspath(os.path.dirname(v))
+                if not os.path.exists(dirpath):
+                    os.makedirs(dirpath)
+                # print(v)
+                self.dcm_to_img_by_path(k, v+'.png')
+                str += k + ' to png success!' + '\n'
+        return str
+
+    def batch_dcm_to_image1(self):
         str = ''
         char = os.path.pathsep
         open_path = self.dcm_path
@@ -107,7 +124,8 @@ class DCMHelper(object):
         print('(%d, %d)' % (rows, cols))
         print(image_data)
 
-# dc = DCMHelper("C:/Users/liu/Desktop/DICOM/IM_0001", '../temp.png')
+# dc = DCMHelper('C:\Users\liu\Desktop\dcm\p1', 'C:\Users\liu\Desktop\pngs')
+# dc.batch_dcm_to_image()
 # infor = dc.read_information()
 # print(infor)
 # dc.dcm_to_img()
